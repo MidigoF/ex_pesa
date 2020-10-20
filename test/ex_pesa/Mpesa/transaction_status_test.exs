@@ -9,7 +9,7 @@ defmodule ExPesa.Mpesa.TransactionStatusTest do
   alias ExPesa.Mpesa.TransactionStatus
 
   setup do
-    mock(fn
+    mock_global(fn
       %{
         url: "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
         method: :get

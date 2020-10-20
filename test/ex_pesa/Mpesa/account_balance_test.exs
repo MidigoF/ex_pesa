@@ -9,7 +9,7 @@ defmodule ExPesa.Mpesa.AccountBalanceTest do
   alias ExPesa.Mpesa.AccountBalance
 
   setup do
-    mock(fn
+    mock_global(fn
       %{
         url: "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
         method: :get

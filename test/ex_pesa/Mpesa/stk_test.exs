@@ -9,7 +9,7 @@ defmodule ExPesa.Mpesa.StkTest do
   alias ExPesa.Mpesa.Stk
 
   setup do
-    mock(fn
+    mock_global(fn
       %{
         url: "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
         method: :get

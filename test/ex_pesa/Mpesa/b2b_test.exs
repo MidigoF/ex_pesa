@@ -9,7 +9,7 @@ defmodule ExPesa.Mpesa.B2BTest do
   alias ExPesa.Mpesa.B2B
 
   setup do
-    mock(fn
+    mock_global(fn
       %{
         url: "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
         method: :get

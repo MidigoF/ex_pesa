@@ -24,35 +24,22 @@ defmodule ExPesa.Mpesa.MpesaBase do
     Tesla.client(middleware)
   end
 
-  def token(client) do
-    {token, datetime} = TokenServer.get()
-
-    if DateTime.compare(datetime, DateTime.utc_now()) !== :gt do
-      case Tesla.get(client, "/oauth/v1/generate?grant_type=client_credentials") |> get_token do
-        {:ok, token} ->
-          #  added 3550 secs, 50 less normal 3600 in 1 hr
-          TokenServer.insert({token, DateTime.add(DateTime.utc_now(), 3550, :second)})
-          {:ok, token}
-
-        {:error, message} ->
-          {:error, message}
-      end
-    else
-      {:ok, token}
-    end
+  def access_token do
+    auth_client()
+    |> Tesla.get("/oauth/v1/generate?grant_type=client_credentials")
+    |> process_token_result()
   end
 
   @doc false
-  def get_token({:ok, %{status: 400} = _response}) do
+  def process_token_result({:ok, %{status: 400} = _response}) do
     {:error, "Wrong Credentials"}
   end
 
-  def get_token({:error, result}) do
+  def process_token_result({:error, result}) do
     {:error, result}
   end
 
-  @doc false
-  def get_token({:ok, %{status: 200, body: body} = _response}) do
+  def process_token_result({:ok, %{status: 200, body: body} = _response}) do
     {:ok, body["access_token"]}
   end
 
@@ -68,7 +55,7 @@ defmodule ExPesa.Mpesa.MpesaBase do
   end
 
   def make_request(url, body) do
-    case token(auth_client()) do
+    case TokenServer.get() do
       {:ok, token} ->
         Tesla.post(client(token), url, body) |> process_result
 

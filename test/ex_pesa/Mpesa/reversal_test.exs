@@ -11,7 +11,7 @@ defmodule ExPesa.Mpesa.ReversalTest do
   @base_url "https://sandbox.safaricom.co.ke"
 
   setup do
-    mock(fn
+    mock_global(fn
       %{
         url: "#{@base_url}/oauth/v1/generate?grant_type=client_credentials",
         method: :get

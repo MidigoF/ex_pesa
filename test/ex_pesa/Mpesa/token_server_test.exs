@@ -4,10 +4,11 @@ defmodule ExPesa.Mpesa.TokenServerTest do
   import Tesla.Mock
   use ExUnit.Case, async: true
   alias ExPesa.Mpesa.TokenServer
-  alias ExPesa.Mpesa.MpesaBase
+
+  @token "SGWcJPtNtYNPGm6uSYR9yPYrAI3Bm"
 
   setup do
-    mock(fn
+    mock_global(fn
       %{
         url: "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
         method: :get
@@ -15,7 +16,7 @@ defmodule ExPesa.Mpesa.TokenServerTest do
         %Tesla.Env{
           status: 200,
           body: %{
-            "access_token" => "SGWcJPtNtYNPGm6uSYR9yPYrAI3Bm",
+            "access_token" => @token,
             "expires_in" => "3599"
           }
         }
@@ -24,29 +25,19 @@ defmodule ExPesa.Mpesa.TokenServerTest do
     :ok
   end
 
-  test "starts OTP server" do
-    TokenServer.start_link()
+  test "the server is started in the application tree" do
+    assert GenServer.whereis(TokenServer)
   end
 
-  test "stores and retrieves token" do
-    org_token = "SGWcJPtNtYNPGm6uSYR9yPYrAI3Bm"
-    TokenServer.insert({org_token, DateTime.add(DateTime.utc_now(), 3550, :second)})
-
-    assert {token, datetime} = TokenServer.get()
-    assert token === org_token
-    assert DateTime.compare(datetime, DateTime.utc_now()) === :gt
+  test "get/1 fetches and stores a new token if there was none initially" do
+   {:ok, token} = TokenServer.get()
+   assert token == @token
   end
 
-  test "new token generated when expired" do
-    org_token = "SGWcJPtNtYNPGm6uSYR9yPYrAI"
-    TokenServer.insert({org_token, DateTime.add(DateTime.utc_now(), -60, :second)})
-    {_token, datetime} = TokenServer.get()
-    assert DateTime.compare(datetime, DateTime.utc_now()) !== :gt
-
-    MpesaBase.token(MpesaBase.auth_client())
-
-    {token, datetime} = TokenServer.get()
-    assert token !== org_token
-    assert DateTime.compare(datetime, DateTime.utc_now()) === :gt
+  test "get/1 returns the token stored in the genserver" do
+    token = "abcdef"
+    {:ok, pid} = GenServer.start_link(TokenServer, token)
+    {:ok, retrieved_token} = TokenServer.get(pid)
+    assert token == retrieved_token
   end
 end
