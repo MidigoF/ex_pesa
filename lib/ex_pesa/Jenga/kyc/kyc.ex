@@ -3,6 +3,8 @@ defmodule ExPesa.Jenga.KYC do
   KYC enabales quering the various registrar of persons in the various countries in East Africa. 
   Visit https://developer.jengaapi.io/reference#identity-verification to see more details
   """
+  import ExPesa.Jenga.JengaBase
+  alias ExPesa.Jenga.Signature
 
   @spec request(map()) :: {:error, any()} | {:ok, any()}
   def request(
