@@ -21,7 +21,7 @@ defmodule ExPesa.Jenga.KYC do
       ) do
     message = "#{merchant_code()}#{documentNumber}#{countryCode}"
 
-    make_request("/customer-test/v2/identity/verify", requestBody, [
+    make_request("/customer/v2/identity/verify", requestBody, [
       {"signature", Signature.sign(message)}
     ])
   end
