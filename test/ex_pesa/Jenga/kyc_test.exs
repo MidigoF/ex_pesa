@@ -24,7 +24,7 @@ defmodule ExPesa.Jenga.KYCTest do
           """
         }
 
-      %{url: "https://uat.jengahq.io/customer-test/v2/identity/verify", method: :post} ->
+      %{url: "https://uat.jengahq.io/customer/v2/identity/verify", method: :post} ->
         %Tesla.Env{
           status: 200,
           body: %{
